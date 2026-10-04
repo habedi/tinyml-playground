@@ -1,7 +1,7 @@
 # Variables
 PYTHON      ?= python3
 PIP         ?= pip3
-DEP_MNGR    ?= poetry
+DEP_MNGR    ?= uv
 DOCS_DIR   ?= docs
 
 # Directories and files to clean
@@ -19,7 +19,7 @@ help: ## Show help messages for all available targets
 
 # Setup and Installation
 .PHONY: setup
-setup: ## Install system dependencies and dependency manager (default: Poetry)
+setup: ## Install system dependencies and dependency manager
 	sudo apt-get update
 	sudo apt-get install -y python3-pip
 	$(PIP) install --upgrade pip
@@ -27,25 +27,16 @@ setup: ## Install system dependencies and dependency manager (default: Poetry)
 
 .PHONY: install
 install: ## Install Python dependencies
-	$(DEP_MNGR) install --all-extras --no-interaction # For Poetry
-	#$(DEP_MNGR) sync --all-extras # For uv
+	$(DEP_MNGR) sync --all-extras # For uv
 
 # Quality and Testing
 .PHONY: test
 test: ## Run tests
 	$(DEP_MNGR) run pytest
 
-.PHONY: lint
-lint: ## Run linter checks
-	$(DEP_MNGR) run ruff check --fix
-
 .PHONY: format
 format: ## Format code
 	$(DEP_MNGR) run ruff format
-
-.PHONY: typecheck
-typecheck: ## Typecheck code
-	$(DEP_MNGR) run mypy .
 
 .PHONY: setup-hooks
 setup-hooks: ## Install Git hooks (pre-commit and pre-push)
@@ -57,20 +48,10 @@ setup-hooks: ## Install Git hooks (pre-commit and pre-push)
 test-hooks: ## Test Git hooks on all files
 	$(DEP_MNGR) run pre-commit run --all-files
 
-# Documentation
-.PHONY: docs
-docs: ## Build documentation
-	$(DEP_MNGR) run mkdocs build
-
 # Build and Publish
 .PHONY: build
 build: ## Build distributions
 	$(DEP_MNGR) build
-
-.PHONY: publish
-publish: ## Publish to PyPI (requires PYPI_TOKEN)
-	$(DEP_MNGR) config pypi-token.pypi $(PYPI_TOKEN)
-	$(DEP_MNGR) publish --build
 
 # Maintenance
 .PHONY: clean
