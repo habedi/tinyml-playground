@@ -27,16 +27,43 @@ setup: ## Install system dependencies and dependency manager
 
 .PHONY: install
 install: ## Install Python dependencies
-	$(DEP_MNGR) sync --all-extras # For uv
+	$(DEP_MNGR) sync --all-groups --all-extras
 
 # Quality and Testing
 .PHONY: test
-test: ## Run tests
-	$(DEP_MNGR) run pytest
+test: ## Run tests with pytest and xdist
+	$(DEP_MNGR) run pytest -n auto
+
+.PHONY: test-unit
+test-unit: ## Run unit tests
+	$(DEP_MNGR) run pytest -m unit
+
+.PHONY: test-hardware
+test-hardware: ## Run hardware tests
+	$(DEP_MNGR) run pytest -m hardware
+
+.PHONY: test-quantization
+test-quantization: ## Run quantization tests
+	$(DEP_MNGR) run pytest -m quantization
 
 .PHONY: format
-format: ## Format code
+format: ## Format code with Ruff
 	$(DEP_MNGR) run ruff format
+
+.PHONY: lint
+lint: ## Check code style and docstrings with Ruff
+	$(DEP_MNGR) run ruff check
+
+.PHONY: lint-fix
+lint-fix: ## Fix auto-fixable Ruff issues
+	$(DEP_MNGR) run ruff check --fix
+
+.PHONY: typecheck
+typecheck: ## Check static types with Pyright
+	$(DEP_MNGR) run pyright
+
+.PHONY: check
+check: lint typecheck test ## Run linter, type checker, and tests
 
 .PHONY: setup-hooks
 setup-hooks: ## Install Git hooks (pre-commit and pre-push)
@@ -47,6 +74,7 @@ setup-hooks: ## Install Git hooks (pre-commit and pre-push)
 .PHONY: test-hooks
 test-hooks: ## Test Git hooks on all files
 	$(DEP_MNGR) run pre-commit run --all-files
+
 
 # Build and Publish
 .PHONY: build

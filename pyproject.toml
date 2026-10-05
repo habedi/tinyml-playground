@@ -6,10 +6,69 @@ description = "The Python environment for the TinyML playground project"
 requires-python = ">=3.14"
 dependencies = [
     "python-dotenv>=1.1.0",
-    "pre-commit>=4.6.2",
     "esptool>=4.8.0",
     "imgtool>=2.4.0",
     "mcp>=2.1.0",
     "torch>=2.11.0",
     "torchvision>=0.26.0",
+]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.6.2",
+    "pyright>=1.1.414",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-xdist>=3.8.0",
+    "ruff>=0.16.10",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra --strict-markers"
+markers = [
+    "unit: marks unit tests",
+    "hardware: marks tests requiring physical hardware or serial connections",
+    "quantization: marks model quantization and conversion tests",
+    "slow: marks tests as slow running",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+exclude = [
+    ".git",
+    ".venv",
+    "tmp",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # Pycodestyle errors
+    "W",   # Pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # Isort
+    "B",   # Flake8-bugbear
+    "UP",  # Pyupgrade
+    "D",   # Pydocstyle
+]
+ignore = [
+    "D100",  # Missing docstring in public module
+    "D104",  # Missing docstring in public package
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.pyright]
+pythonVersion = "3.14"
+typeCheckingMode = "standard"
+include = ["tests"]
+exclude = [
+    "**/__pycache__",
+    ".venv",
+    "tmp",
 ]

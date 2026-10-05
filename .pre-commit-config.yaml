@@ -1,6 +1,6 @@
 default_stages: [ pre-push ]
 fail_fast: false
-exclude: '(^external/|^docs/)'
+exclude: '(^external/|^docs/|^tmp/)'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -17,14 +17,29 @@ repos:
       - id: check-toml
       - id: check-json
       - id: check-docstring-first
+      - id: debug-statements
       - id: pretty-format-json
         args: [ --autofix, --no-sort-keys ]
 
   - repo: local
     hooks:
       - id: format
-        name: Format Code
+        name: Format Code with Ruff
         entry: make format
+        language: system
+        pass_filenames: false
+        stages: [ pre-commit ]
+
+      - id: lint
+        name: Lint Code with Ruff
+        entry: make lint
+        language: system
+        pass_filenames: false
+        stages: [ pre-commit ]
+
+      - id: typecheck
+        name: Type Check with Pyright
+        entry: make typecheck
         language: system
         pass_filenames: false
         stages: [ pre-commit ]
@@ -34,3 +49,4 @@ repos:
         entry: make test
         language: system
         pass_filenames: false
+        stages: [ pre-push ]
